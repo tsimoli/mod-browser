@@ -1,0 +1,13 @@
+{
+	"name": "Mod",
+	"description": "An extension built with Parcel and TailwindCSS.",
+	"version": "1.0",
+	"manifest_version": 2,
+	"browser_action": {
+		"default_popup": "index.html",
+		"default_title": "Mod"
+	},
+	"permissions": [
+		"storage"
+	]
+}
