@@ -1,7 +1,7 @@
 import * as React from 'react'
-import { Login } from './Login'
-import { Home } from './Home'
-import { Initial } from './Initial'
+import { Login } from './components/Login'
+import { Home } from './components/Home'
+import { Initial } from './components/Initial'
 import { TokenProvider, useTokens } from '../../context/TokenProvider'
 import {
   Route,
