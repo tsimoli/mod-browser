@@ -1,6 +1,29 @@
-import * as React from "react";
+import * as React from 'react'
+import { LoginApi } from '../../../api/api'
+import { save } from '../../../storage/Storage'
 
 export const Login = (): JSX.Element => {
+  const [value, setValue] = React.useState({
+    email: '',
+    password: '',
+  })
+  const handleChange = (e: React.FormEvent<EventTarget>) => {
+    let target = e.target as HTMLInputElement
+    setValue({ ...value, [target.name]: target.value })
+  }
+  const handleSubmit = (e: React.FormEvent) => {
+    console.log(value)
+    e.preventDefault()
+    LoginApi.tryLogin(value.email, value.password)
+      .then((login) => {
+        console.log(login)
+        save('tokens', login)
+      })
+      .catch((error) => {
+        console.log('Show wrong email or password')
+        console.log(error)
+      })
+  }
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
@@ -14,7 +37,7 @@ export const Login = (): JSX.Element => {
             Sign in to your account
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
-            Or{" "}
+            Or{' '}
             <a
               href="#"
               className="font-medium text-indigo-600 hover:text-indigo-500"
@@ -36,6 +59,8 @@ export const Login = (): JSX.Element => {
                 type="email"
                 autoComplete="email"
                 required
+                value={value.email}
+                onChange={handleChange}
                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                 placeholder="Email address"
               />
@@ -50,6 +75,8 @@ export const Login = (): JSX.Element => {
                 type="password"
                 autoComplete="current-password"
                 required
+                value={value.password}
+                onChange={handleChange}
                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                 placeholder="Password"
               />
@@ -57,21 +84,6 @@ export const Login = (): JSX.Element => {
           </div>
 
           <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <input
-                id="remember_me"
-                name="remember_me"
-                type="checkbox"
-                className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-              />
-              <label
-                htmlFor="remember_me"
-                className="ml-2 block text-sm text-gray-900"
-              >
-                Remember me
-              </label>
-            </div>
-
             <div className="text-sm">
               <a
                 href="#"
@@ -86,6 +98,7 @@ export const Login = (): JSX.Element => {
             <button
               type="submit"
               className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              onClick={handleSubmit}
             >
               Sign in
             </button>
@@ -93,5 +106,5 @@ export const Login = (): JSX.Element => {
         </form>
       </div>
     </div>
-  );
-};
+  )
+}

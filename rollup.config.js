@@ -8,6 +8,8 @@ import { chromeExtension, simpleReloader } from 'rollup-plugin-chrome-extension'
 import { emptyDir } from 'rollup-plugin-empty-dir'
 import zip from 'rollup-plugin-zip'
 import replace from 'rollup-plugin-replace'
+import json from 'rollup-plugin-json'
+
 const isProduction = process.env.NODE_ENV === 'production'
 const production = !process.env.ROLLUP_WATCH
 export default {
@@ -18,13 +20,14 @@ export default {
     chunkFileNames: path.join('chunks', '[name]-[hash].js'),
   },
   plugins: [
+    json(),
     replace({
       'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
     }),
     chromeExtension(),
     // Adds a Chrome extension reloader during watch mode
     simpleReloader(),
-    resolve(),
+    resolve({ jsnext: true, preferBuiltins: true, browser: true }),
     commonjs(),
     typescript(),
     postcss({ minimize: production }),

@@ -18,5 +18,9 @@
   "browser_action": {
     "default_popup": "pages/popup/index.html"
   },
+  "permissions": [
+    "storage",
+    "*://*.localhost/*"
+  ],
   "name": "mod-browser"
 }
