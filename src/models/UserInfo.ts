@@ -1,6 +1,6 @@
 export interface Tokens {
-  accessToken: string
-  renewalToken: string
+  access_token: string
+  renewal_token: string
 }
 
 export type UserInfoContextType = {

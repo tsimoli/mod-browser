@@ -3,18 +3,23 @@ import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios'
 import { Tokens, UserInfoContextType } from '../models/UserInfo'
 import { get, save } from '../storage/Storage'
 import { LoginResponse } from '../models/LoginResponse'
+import { ModModel } from '../models/Mod'
+
+const config = {
+  baseURL: 'http://localhost:4000/api/v1',
+  timeout: 15000,
+}
 
 const onRequest = async (
   config: AxiosRequestConfig,
 ): Promise<AxiosRequestConfig> => {
   const tokens = await get<Tokens>('tokens')
-  const auth = tokens ? `Bearer ${tokens.accessToken}` : ''
+  const auth = tokens ? `${tokens.access_token}` : ''
   config.headers.common['Authorization'] = auth
   config.headers.common['Accept'] = 'application/json'
   config.headers.common['Content-Type'] = 'application/json'
   config.headers.common['Access-Control-Allow-Origin'] = '*'
 
-  console.info(`[request] [${JSON.stringify(config)}]`)
   return config
 }
 
@@ -27,40 +32,41 @@ const onResponse = (response: AxiosResponse): AxiosResponse => {
   return response
 }
 
-const onResponseError = async (error: AxiosError): Promise<AxiosError> => {
-  console.error(`[response error] [${JSON.stringify(error)}]`)
-  const { status, data } = error.response
-  const originalRequest = error.request
-  if (status === 401 && error.config && !originalRequest._retry) {
-    originalRequest._retry = true
+const onResponseError = async (error: AxiosError) => {
+  const originalRequest = error.config
+  if (
+    error.response &&
+    error.response.status === 401 &&
+    error.config &&
+    !error.request._retry
+  ) {
+    error.request._retry = true
     const tokens = await get<Tokens>('tokens')
     if (tokens != null) {
-      let res = fetch('http://localhost:4000/api/v1/session/renew', {
-        method: 'POST',
-        mode: 'cors',
-        cache: 'no-cache',
-        credentials: 'same-origin',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: tokens.renewalToken,
-        },
-      })
-        .then((res) => res.json())
+      const axiosInstance = axios.create(config)
+      let res = axiosInstance
+        .post(
+          'session/renew',
+          {},
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: tokens.renewal_token,
+            },
+          },
+        )
         .then((res) => {
-          console.log(res)
-          let { access_token, renewal_token } = res.data
+          let { access_token, renewal_token } = res.data.data
           save('tokens', {
-            accessToken: access_token,
-            renewalToken: renewal_token,
+            access_token: access_token,
+            renewal_token: renewal_token,
           })
-          originalRequest.headers['Authorization'] = `Bearer ${access_token}`
-
-          const axiosInstance = instance()
+          originalRequest.headers['Authorization'] = `${access_token}`
 
           return axiosInstance(originalRequest)
         })
 
-      Promise.resolve(res)
+      return res
     } else {
       return Promise.reject(error)
     }
@@ -70,10 +76,7 @@ const onResponseError = async (error: AxiosError): Promise<AxiosError> => {
 }
 
 const instance = () => {
-  const axiosInstance = axios.create({
-    baseURL: 'http://localhost:4000/api/v1',
-    timeout: 15000,
-  })
+  const axiosInstance = axios.create(config)
 
   axiosInstance.interceptors.request.use(onRequest, onRequestError)
   axiosInstance.interceptors.response.use(onResponse, onResponseError)
@@ -84,7 +87,7 @@ const instance = () => {
 const responseBody = (response: AxiosResponse) => response.data
 
 const requests = {
-  get: (url: string) => instance().get(url).then(responseBody),
+  get: (url: string) => instance().get(url),
   post: (url: string, body: {}) =>
     instance().post(url, body).then(responseBody),
   //   put: (url: string, body: {}) => instance().put(url, body).then(responseBody),
@@ -96,6 +99,19 @@ export const LoginApi = {
     return requests.post('session', {
       user: { email: email1, password: password1 },
     })
+  },
+  // getPosts: (): Promise<PostType[]> => requests.get('posts'),
+  // getAPost: (id: number): Promise<PostType> => requests.get(`posts/${id}`),
+  // createPost: (post: PostType): Promise<PostType> =>
+  // 	requests.post('posts', post),
+  // updatePost: (post: PostType, id: number) =>
+  // 	requests.put(`posts/${id}`, post),
+  // deletePost: (id: number): Promise<void> => requests.delete(`posts/${id}`),
+}
+
+export const ModApi = {
+  getDailyMod: (): any => {
+    return requests.get('mods/daily')
   },
   // getPosts: (): Promise<PostType[]> => requests.get('posts'),
   // getAPost: (id: number): Promise<PostType> => requests.get(`posts/${id}`),

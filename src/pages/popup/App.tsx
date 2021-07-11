@@ -32,7 +32,6 @@ const App = (): JSX.Element => {
 
 export function PrivateRoute({ component: Component, ...rest }): JSX.Element {
   const userInfo = useUserInfo()
-  console.log(userInfo)
 
   return (
     <Route

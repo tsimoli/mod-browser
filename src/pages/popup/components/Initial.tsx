@@ -7,7 +7,7 @@ export const Initial = (): JSX.Element => {
   const userInfo = useUserInfo()
 
   if (userInfo.tokens) {
-    return <Redirect to="/mod/" />
+    return <Redirect to="/mod" />
   } else {
     return (
       <div className="min-h-screen flex items-center">

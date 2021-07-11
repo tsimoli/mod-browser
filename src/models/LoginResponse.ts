@@ -1,4 +1,6 @@
-export interface LoginResponse 	{
-	accessToken: string,
-	refeshToken: string
+export interface LoginResponse {
+  data: {
+    access_token: string
+    refesh_token: string
+  }
 }

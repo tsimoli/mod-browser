@@ -1,3 +1,4 @@
+import { AxiosError } from 'axios'
 import * as React from 'react'
 import { LoginApi } from '../../../api/api'
 import { save } from '../../../storage/Storage'
@@ -7,21 +8,25 @@ export const Login = (): JSX.Element => {
     email: '',
     password: '',
   })
+
+  const [error, setError] = React.useState(null)
+
   const handleChange = (e: React.FormEvent<EventTarget>) => {
     let target = e.target as HTMLInputElement
     setValue({ ...value, [target.name]: target.value })
   }
   const handleSubmit = (e: React.FormEvent) => {
-    console.log(value)
     e.preventDefault()
     LoginApi.tryLogin(value.email, value.password)
-      .then((login) => {
-        console.log(login)
-        save('tokens', login)
+      .then((loginInfo) => {
+        save('tokens', loginInfo.data)
       })
       .catch((error) => {
-        console.log('Show wrong email or password')
-        console.log(error)
+        if (error.request.status == 0) {
+          setError('No connection to server')
+        } else {
+          setError((error as AxiosError)?.response?.data.error.message)
+        }
       })
   }
   return (
@@ -82,7 +87,11 @@ export const Login = (): JSX.Element => {
               />
             </div>
           </div>
-
+          {error && (
+            <div className="flex items-center justify-between">
+              <div className="text-sm text-red-500">{error}</div>
+            </div>
+          )}
           <div className="flex items-center justify-between">
             <div className="text-sm">
               <a
