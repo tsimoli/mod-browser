@@ -1,6 +1,6 @@
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios'
 
-import { Tokens, UserInfoContextType } from '../models/UserInfo'
+import {Tokens } from '../models/UserInfo'
 import { get, save } from '../storage/Storage'
 import { LoginResponse } from '../models/LoginResponse'
 import { ModModel } from '../models/Mod'
@@ -112,6 +112,9 @@ export const LoginApi = {
 export const ModApi = {
   getDailyMod: (): any => {
     return requests.get('mods/daily')
+  },
+  getDailyGuestMod: (): any => {
+    return requests.get('guest/mods/daily')
   },
   // getPosts: (): Promise<PostType[]> => requests.get('posts'),
   // getAPost: (id: number): Promise<PostType> => requests.get(`posts/${id}`),

@@ -2,6 +2,7 @@ import * as React from 'react'
 import { Login } from './components/Login'
 import { Home } from './components/Home'
 import { Mod } from './components/Mod'
+import { GuestMod } from './components/GuestMod'
 import { Initial } from './components/Initial'
 import { UserInfoProvider, useUserInfo } from '../../context/UserInfoProvider'
 import {
@@ -21,6 +22,7 @@ const App = (): JSX.Element => {
               <Route exact path="/Login" component={Login} />
               <PrivateRoute exact path="/home" component={Home} />
               <Route path="/mod" component={Mod} />
+              <Route path="guest/mod" component={GuestMod} />
               <Route path="*" component={Initial} />
             </Switch>
           </Router>

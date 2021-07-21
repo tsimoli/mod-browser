@@ -13,7 +13,7 @@ export const Initial = (): JSX.Element => {
       <div className="min-h-screen flex items-center">
         <div className="m-auto">
           <div className="">
-            <Link to={'/mod'} className="">
+            <Link to={'guest/mod'} className="">
               Start
             </Link>
           </div>
